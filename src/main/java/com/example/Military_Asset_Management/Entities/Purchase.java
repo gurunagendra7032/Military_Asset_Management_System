@@ -1,12 +1,11 @@
 package com.example.Military_Asset_Management.Entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+
 
 import java.time.LocalDate;
 
-import java.util.Date;
 
 @Entity
 public class Purchase {
@@ -15,6 +14,8 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.AUTO)
    private Integer id;
    private String equipmentType;
+   private String equipmentName;
+   @NotNull
    private Integer quantity;
    private LocalDate purchaseDate;
    @ManyToOne
@@ -58,5 +59,13 @@ public class Purchase {
 
     public void setBase(Base base) {
         this.base = base;
+    }
+
+    public String getEquipmentName() {
+        return equipmentName;
+    }
+
+    public void setEquipmentName(String equipmentName) {
+        this.equipmentName = equipmentName;
     }
 }

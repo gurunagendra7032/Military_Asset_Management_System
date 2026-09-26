@@ -2,6 +2,7 @@ package com.example.Military_Asset_Management.Entities;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,8 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String equipmentType;
+    private String equipmentName;
+    @NotNull
     private Integer equipmentQuantity;
     private LocalDateTime transferDate;
 
@@ -67,5 +70,13 @@ public class Transfer {
 
     public void setToBase(Base toBase) {
         this.toBase = toBase;
+    }
+
+    public String getEquipmentName() {
+        return equipmentName;
+    }
+
+    public void setEquipmentName(String equipmentName) {
+        this.equipmentName = equipmentName;
     }
 }

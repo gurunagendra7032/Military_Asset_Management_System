@@ -1,6 +1,7 @@
 package com.example.Military_Asset_Management.Entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
@@ -10,6 +11,7 @@ public class Expenditure {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String equipmentType;
+    @NotNull
     private Integer equipmentQuantity;
     private String reason;
     @ManyToOne
