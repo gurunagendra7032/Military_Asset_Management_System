@@ -14,6 +14,7 @@ public class ItemAssignment {
     private Integer id;
     @NotEmpty
     private String personName;
+    private String equipmentType;
     private String assetName;
     @NotNull
     private Integer assetQuantity;
@@ -30,12 +31,20 @@ public class ItemAssignment {
         this.id = id;
     }
 
-    public String getPersonName() {
+    public @NotEmpty String getPersonName() {
         return personName;
     }
 
-    public void setPersonName(String personName) {
+    public void setPersonName(@NotEmpty String personName) {
         this.personName = personName;
+    }
+
+    public String getEquipmentType() {
+        return equipmentType;
+    }
+
+    public void setEquipmentType(String equipmentType) {
+        this.equipmentType = equipmentType;
     }
 
     public String getAssetName() {
@@ -46,11 +55,11 @@ public class ItemAssignment {
         this.assetName = assetName;
     }
 
-    public Integer getAssetQuantity() {
+    public @NotNull Integer getAssetQuantity() {
         return assetQuantity;
     }
 
-    public void setAssetQuantity(Integer assetQuantity) {
+    public void setAssetQuantity(@NotNull Integer assetQuantity) {
         this.assetQuantity = assetQuantity;
     }
 

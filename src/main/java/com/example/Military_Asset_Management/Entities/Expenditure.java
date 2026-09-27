@@ -10,6 +10,7 @@ public class Expenditure {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    private String equipmentName;
     private String equipmentType;
     @NotNull
     private Integer equipmentQuantity;
@@ -26,12 +27,12 @@ public class Expenditure {
         this.id = id;
     }
 
-    public String getEquipmentType() {
-        return equipmentType;
+    public String getEquipmentName() {
+        return equipmentName;
     }
 
-    public void setEquipmentType(String equipmentType) {
-        this.equipmentType = equipmentType;
+    public void setEquipmentName(String equipmentName) {
+        this.equipmentName = equipmentName;
     }
 
     public Integer getEquipmentQuantity() {
@@ -64,5 +65,13 @@ public class Expenditure {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getEquipmentType() {
+        return equipmentType;
+    }
+
+    public void setEquipmentType(String equipmentType) {
+        this.equipmentType = equipmentType;
     }
 }
