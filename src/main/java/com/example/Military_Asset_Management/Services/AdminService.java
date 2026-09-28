@@ -1,152 +1,145 @@
 package com.example.Military_Asset_Management.Services;
 
+import com.example.Military_Asset_Management.DTOs.SignupReqDto;
+import com.example.Military_Asset_Management.DTOs.SignupResDto;
 import com.example.Military_Asset_Management.Entities.*;
-import com.example.Military_Asset_Management.Repositories.ExpenditureRepo;
-import com.example.Military_Asset_Management.Repositories.ItemAssignmentRepo;
-import com.example.Military_Asset_Management.Repositories.PurchaseRepo;
-import com.example.Military_Asset_Management.Repositories.TransferRepo;
+import com.example.Military_Asset_Management.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class AdminService {
-    @Autowired
-    private PurchaseRepo purchaseRepo;
-    @Autowired
-    private TransferRepo transferRepo;
-    @Autowired
-    private ItemAssignmentRepo itemAssignmentRepo;
-    @Autowired
-    private ExpenditureRepo expenditureRepo;
 
-    public int getOpeningBalance(Integer baseId, String equipmentType, LocalDate date){
+    @Autowired private PurchaseRepo purchaseRepo;
+    @Autowired private TransferRepo transferRepo;
+    @Autowired private ItemAssignmentRepo itemAssignmentRepo;
+    @Autowired private ExpenditureRepo expenditureRepo;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private BaseRepo baseRepo;
+    @Autowired private UserRepo userRepo;
+
+    // ---------- helpers ----------
+    private int sumPurchases(List<Purchase> list) {
+        return list.stream().mapToInt(Purchase::getQuantity).sum();
+    }
+
+    private int sumTransfers(List<Transfer> list) {
+        return list.stream().mapToInt(Transfer::getEquipmentQuantity).sum();
+    }
+
+    private int sumAssignments(List<ItemAssignment> list) {
+        return list.stream().mapToInt(ItemAssignment::getAssetQuantity).sum();
+    }
+
+    private int sumExpenditures(List<Expenditure> list) {
+        return list.stream().mapToInt(Expenditure::getEquipmentQuantity).sum();
+    }
+
+
+    public int getOpeningBalance(Integer baseId, String equipmentType, LocalDate date) {
 
         LocalDateTime dateTime = date.atStartOfDay();
 
-        List<Purchase> purchase=purchaseRepo
-                .findByBaseIdAndEquipmentTypeAndPurchaseDateBefore(baseId,equipmentType,date);
+        int purchases = sumPurchases(purchaseRepo
+                .findByBaseIdAndEquipmentTypeAndPurchaseDateBefore(baseId, equipmentType, date));
 
-        List<Transfer> transferIn=transferRepo
-                .findByToBaseIdAndEquipmentTypeAndTransferDateBefore(baseId,equipmentType,dateTime);
+        int transferIn = sumTransfers(transferRepo
+                .findByToBaseIdAndEquipmentTypeAndTransferDateBefore(baseId, equipmentType, dateTime));
 
-        List<Transfer> transferOut=transferRepo
-                .findByFromBaseIdAndEquipmentTypeAndTransferDateBefore(baseId,equipmentType,dateTime);
+        int transferOut = sumTransfers(transferRepo
+                .findByFromBaseIdAndEquipmentTypeAndTransferDateBefore(baseId, equipmentType, dateTime));
 
-        List<ItemAssignment> itemAssignments=itemAssignmentRepo
-                .findByBaseIdAndEquipmentTypeAndAssignedDateBefore(baseId,equipmentType,dateTime);
+        int assigned = sumAssignments(itemAssignmentRepo
+                .findByBaseIdAndEquipmentTypeAndAssignedDateBefore(baseId, equipmentType, date));
 
-        List<Expenditure> expenditure = expenditureRepo
-                .findByBaseIdAndEquipmentTypeAndDateBefore(baseId,equipmentType,dateTime);
+        int expended = sumExpenditures(expenditureRepo
+                .findByBaseIdAndEquipmentTypeAndDateBefore(baseId, equipmentType, date));
 
-        int purchaseQuantity = purchase.stream()
-                .mapToInt(Purchase::getQuantity)
-                .sum();
-
-        int transferInQuantity = transferIn.stream()
-                .mapToInt(Transfer::getEquipmentQuantity)
-                .sum();
-
-        int transferOutQuantity = transferOut.stream()
-                .mapToInt(Transfer::getEquipmentQuantity)
-                .sum();
-
-        int itemAssignQuantity= itemAssignments.stream()
-                .mapToInt(ItemAssignment :: getAssetQuantity)
-                .sum();
-
-        int expenditureQuantity= expenditure.stream()
-                .mapToInt(Expenditure :: getEquipmentQuantity)
-                .sum();
-
-        int OpenBalance = purchaseQuantity+transferInQuantity-transferOutQuantity-itemAssignQuantity-expenditureQuantity;
-
-
-        return OpenBalance;
-
+        return purchases + transferIn - transferOut - assigned - expended;
     }
 
 
-    public int closingBalance(Integer baseId, String equipmentType, LocalDate date){
+    public int closingBalance(Integer baseId, String equipmentType, LocalDate date) {
 
         LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        LocalDateTime end = date.atTime(23, 59, 59);   // FIX: stay inside the same day
 
-        List<Purchase> purchase=purchaseRepo
-                .findByBaseIdAndEquipmentTypeAndPurchaseDate(baseId,equipmentType,date);
+        int purchases = sumPurchases(purchaseRepo
+                .findByBaseIdAndEquipmentTypeAndPurchaseDate(baseId, equipmentType, date));
 
-        List<Transfer> transferIn=transferRepo
-                .findByToBaseIdAndEquipmentTypeAndTransferDateBetween(baseId,equipmentType,start,end);
+        int transferIn = sumTransfers(transferRepo
+                .findByToBaseIdAndEquipmentTypeAndTransferDateBetween(baseId, equipmentType, start, end));
 
-        List<Transfer> transferOut=transferRepo
-                .findByFromBaseIdAndEquipmentTypeAndTransferDateBetween(baseId,equipmentType,start,end);
+        int transferOut = sumTransfers(transferRepo
+                .findByFromBaseIdAndEquipmentTypeAndTransferDateBetween(baseId, equipmentType, start, end));
 
-        List<ItemAssignment> itemAssignments=itemAssignmentRepo
-                .findByBaseIdAndEquipmentTypeAndAssignedDateBetween(baseId,equipmentType,start,end);
+        int assigned = sumAssignments(itemAssignmentRepo
+                .findByBaseIdAndEquipmentTypeAndAssignedDateBetween(baseId, equipmentType, date, date));
 
-        List<Expenditure> expenditure = expenditureRepo
-                .findByBaseIdAndEquipmentTypeAndDateBetween(baseId,equipmentType,start,end);
+        int expended = sumExpenditures(expenditureRepo
+                .findByBaseIdAndEquipmentTypeAndDateBetween(baseId, equipmentType, date, date));
 
-        int purchaseQuantity = purchase.stream()
-                .mapToInt(Purchase::getQuantity)
-                .sum();
+        int dayMovement = purchases + transferIn - transferOut - assigned - expended;
 
-        int transferInQuantity = transferIn.stream()
-                .mapToInt(Transfer::getEquipmentQuantity)
-                .sum();
+        return getOpeningBalance(baseId, equipmentType, date) + dayMovement;
+    }
 
-        int transferOutQuantity = transferOut.stream()
-                .mapToInt(Transfer::getEquipmentQuantity)
-                .sum();
+    // ---------- net movement: purchases + transfers in - transfers out ----------
+    public int NetMovement(Integer baseId, String equipmentType, LocalDate date) {
 
-        int itemAssignQuantity= itemAssignments.stream()
-                .mapToInt(ItemAssignment :: getAssetQuantity)
-                .sum();
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.atTime(23, 59, 59);   // FIX
 
-        int expenditureQuantity= expenditure.stream()
-                .mapToInt(Expenditure :: getEquipmentQuantity)
-                .sum();
+        int purchases = sumPurchases(purchaseRepo
+                .findByBaseIdAndEquipmentTypeAndPurchaseDate(baseId, equipmentType, date));
 
-        int closingBalance = purchaseQuantity+transferInQuantity-transferOutQuantity-itemAssignQuantity-expenditureQuantity;
+        int transferIn = sumTransfers(transferRepo
+                .findByToBaseIdAndEquipmentTypeAndTransferDateBetween(baseId, equipmentType, start, end));
 
+        int transferOut = sumTransfers(transferRepo
+                .findByFromBaseIdAndEquipmentTypeAndTransferDateBetween(baseId, equipmentType, start, end));
 
-
-
-        return getOpeningBalance(baseId,equipmentType,date)+closingBalance;
-
-
+        return purchases + transferIn - transferOut;
     }
 
 
-    public int NetMovement(Integer baseId, String equipmentType, LocalDate date){
+    public int getItemAssign(Integer baseId, String equipmentType, LocalDate date){
+        int assigned = sumAssignments(itemAssignmentRepo
+                .findByBaseIdAndEquipmentTypeAndAssignedDateBetween(baseId, equipmentType, date, date));
+        return assigned;
+    }
 
-        LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.plusDays(1).atStartOfDay();
+    public int getExpendItem(Integer baseId, String equipmentType, LocalDate date){
+        int expend = sumExpenditures(expenditureRepo
+                .findByBaseIdAndEquipmentTypeAndDateBetween(baseId, equipmentType, date, date));
+        return expend;
+    }
 
-        List<Purchase> purchase=purchaseRepo
-                .findByBaseIdAndEquipmentTypeAndPurchaseDate(baseId,equipmentType,date);
 
-        List<Transfer> transferIn=transferRepo
-                .findByToBaseIdAndEquipmentTypeAndTransferDateBetween(baseId,equipmentType,start,end);
 
-        List<Transfer> transferOut=transferRepo
-                .findByFromBaseIdAndEquipmentTypeAndTransferDateBetween(baseId,equipmentType,start,end);
 
-        int purchaseQuantity = purchase.stream()
-                .mapToInt(Purchase::getQuantity)
-                .sum();
 
-        int transferInQuantity = transferIn.stream()
-                .mapToInt(Transfer::getEquipmentQuantity)
-                .sum();
+    public SignupResDto saveBaseCommander(SignupReqDto signupReqDto) {
 
-        int transferOutQuantity = transferOut.stream()
-                .mapToInt(Transfer::getEquipmentQuantity)
-                .sum();
+        User user = new User();
+        user.setUserName(signupReqDto.getName());
+        user.setUserEmail(signupReqDto.getEmail());
+        user.setPassword(passwordEncoder.encode(signupReqDto.getPassword()));
 
-        int netmovemet=purchaseQuantity+transferInQuantity-transferOutQuantity;
+        Base base = baseRepo.findById(signupReqDto.getBaseId())
+                .orElseThrow(() -> new RuntimeException("Base not found"));
+        user.setBase(base);
+        user.setRole(Role.BASE_COMMANDER);
+        userRepo.save(user);
 
-        return netmovemet;
+        SignupResDto res = new SignupResDto();
+        res.setName(user.getUserName());
+        res.setEmail(user.getUserEmail());
+        return res;
     }
 }

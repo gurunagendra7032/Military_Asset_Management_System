@@ -7,8 +7,5 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class config {
 
-    @Bean
-    public AdminService adminService(){
-        return new AdminService();
-    }
+
 }

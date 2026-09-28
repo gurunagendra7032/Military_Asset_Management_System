@@ -6,6 +6,7 @@ public class SignupReqDto {
     private String name;
     private String email;
     private String password;
+    private Integer baseId;
 
     public String getName() {
         return name;
@@ -29,5 +30,13 @@ public class SignupReqDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getBaseId() {
+        return baseId;
+    }
+
+    public void setBaseId(Integer baseId) {
+        this.baseId = baseId;
     }
 }
