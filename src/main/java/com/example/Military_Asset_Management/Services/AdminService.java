@@ -142,4 +142,19 @@ public class AdminService {
         res.setEmail(user.getUserEmail());
         return res;
     }
+
+    public SignupResDto saveAdmin(SignupReqDto signupReqDto){
+        User user=new User();
+        user.setUserName(signupReqDto.getName());
+        user.setUserEmail(signupReqDto.getEmail());
+        user.setUserName(signupReqDto.getPassword());
+        user.setRole(Role.ADMIN);
+        userRepo.save(user);
+
+        SignupResDto res = new SignupResDto();
+        res.setName(user.getUserName());
+        res.setEmail(user.getUserEmail());
+        return res;
+
+    }
 }

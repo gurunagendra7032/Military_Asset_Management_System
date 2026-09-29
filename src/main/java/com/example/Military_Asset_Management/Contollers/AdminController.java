@@ -86,4 +86,9 @@
         public SignupResDto saveBase_Commander(@RequestBody SignupReqDto signupReqDto){
             return adminService.saveBaseCommander(signupReqDto);
         }
+
+        @PostMapping("/admin/signup")
+        public SignupResDto saveAdmin(@RequestBody SignupReqDto signupReqDto){
+            return adminService.saveAdmin(signupReqDto);
+        }
     }
