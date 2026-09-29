@@ -50,6 +50,8 @@ public class SecurityConfiguration {
                                 "/save/expenditure",
                                 "/expenditure/**"
                         ).hasAnyRole("BASE_COMMANDER","ADMIN")
+                        .requestMatchers("/save/base")
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 
