@@ -67,7 +67,7 @@ public class AdminService {
     public int closingBalance(Integer baseId, String equipmentType, LocalDate date) {
 
         LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.atTime(23, 59, 59);   // FIX: stay inside the same day
+        LocalDateTime end = date.atTime(23, 59, 59);
 
         int purchases = sumPurchases(purchaseRepo
                 .findByBaseIdAndEquipmentTypeAndPurchaseDate(baseId, equipmentType, date));
@@ -89,7 +89,7 @@ public class AdminService {
         return getOpeningBalance(baseId, equipmentType, date) + dayMovement;
     }
 
-    // ---------- net movement: purchases + transfers in - transfers out ----------
+
     public int NetMovement(Integer baseId, String equipmentType, LocalDate date) {
 
         LocalDateTime start = date.atStartOfDay();
