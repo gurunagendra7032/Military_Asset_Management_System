@@ -2,9 +2,11 @@ package com.example.Military_Asset_Management.Services;
 
 import com.example.Military_Asset_Management.DTOs.SignupReqDto;
 import com.example.Military_Asset_Management.DTOs.SignupResDto;
+import com.example.Military_Asset_Management.Entities.Admin;
 import com.example.Military_Asset_Management.Entities.Base;
 import com.example.Military_Asset_Management.Entities.Role;
 import com.example.Military_Asset_Management.Entities.User;
+import com.example.Military_Asset_Management.Repositories.AdminRepo;
 import com.example.Military_Asset_Management.Repositories.BaseRepo;
 import com.example.Military_Asset_Management.Repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AdminRepo adminRepo;
+
     public SignupResDto saveUser(SignupReqDto signupReqDto){
         User user=new User();
         user.setUserName(signupReqDto.getName());
@@ -47,12 +52,31 @@ public class UserService implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByUserEmail(username);
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUserEmail())
-                .password(user.getPassword())
-                .roles(user.getRole().name())
-                .build();
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
+
+        User user = userRepo.findByUserEmail(email);
+
+        if (user != null) {
+            return org.springframework.security.core.userdetails.User
+                    .builder()
+                    .username(user.getUserEmail())
+                    .password(user.getPassword())
+                    .roles(user.getRole().toString())
+                    .build();
+        }
+
+        Admin admin = adminRepo.findByEmail(email);
+
+        if (admin != null) {
+            return org.springframework.security.core.userdetails.User
+                    .builder()
+                    .username(admin.getEmail())
+                    .password(admin.getPassword())
+                    .roles("ADMIN")
+                    .build();
+        }
+
+        throw new UsernameNotFoundException("Account not found");
     }
 }

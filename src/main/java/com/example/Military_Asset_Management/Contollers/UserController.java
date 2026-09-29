@@ -3,8 +3,10 @@ package com.example.Military_Asset_Management.Contollers;
 import com.example.Military_Asset_Management.DTOs.LoginResDto;
 import com.example.Military_Asset_Management.DTOs.SignupReqDto;
 import com.example.Military_Asset_Management.DTOs.SignupResDto;
+import com.example.Military_Asset_Management.Entities.Admin;
 import com.example.Military_Asset_Management.Entities.Base;
 import com.example.Military_Asset_Management.Entities.User;
+import com.example.Military_Asset_Management.Repositories.AdminRepo;
 import com.example.Military_Asset_Management.Repositories.BaseRepo;
 import com.example.Military_Asset_Management.Repositories.UserRepo;
 import com.example.Military_Asset_Management.Services.JWTService;
@@ -16,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
@@ -41,55 +44,85 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AdminRepo adminRepo;
+
     @PostMapping("/logistic_officer/signup")
     public SignupResDto saveUser(@RequestBody SignupReqDto reqDto){
         return userService.saveUser(reqDto);
     }
 
+//    @PostMapping("/login")
+//    public String loginUser(@RequestBody LoginResDto loginResDto) {
+//
+//        System.out.println("LOGIN CONTROLLER CALLED");
+//
+//        try {
+//
+//            Authentication authentication =
+//                    authenticationManager.authenticate(
+//                            new UsernamePasswordAuthenticationToken(
+//                                    loginResDto.getEmail(),
+//                                    loginResDto.getPassword()
+//                            )
+//                    );
+//
+//            System.out.println("AUTHENTICATION SUCCESSFUL");
+//            System.out.println("USER: " + authentication.getName());
+//            System.out.println("AUTHORITIES: " + authentication.getAuthorities());
+//
+//            String email = authentication.getName();
+//
+//            String role = authentication.getAuthorities()
+//                    .stream()
+//                    .findFirst()
+//                    .get()
+//                    .getAuthority()
+//                    .replace("ROLE_", "");
+//
+//            System.out.println("ROLE: " + role);
+//
+//            String token = jwtService.generateToken(email, role);
+//
+//            System.out.println("TOKEN GENERATED");
+//
+//            return token;
+//
+//        } catch (Exception e) {
+//
+//            System.out.println("LOGIN ERROR: " + e.getClass().getName());
+//            System.out.println("LOGIN ERROR MESSAGE: " + e.getMessage());
+//
+//            throw e;
+//        }
+//    }
+
+
     @PostMapping("/login")
     public String loginUser(@RequestBody LoginResDto loginResDto) {
 
-        System.out.println("LOGIN CONTROLLER CALLED");
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                loginResDto.getEmail(),
+                                loginResDto.getPassword()
+                        )
+                );
 
-        try {
+        String email = authentication.getName();
 
-            Authentication authentication =
-                    authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(
-                                    loginResDto.getEmail(),
-                                    loginResDto.getPassword()
-                            )
-                    );
+        String role = authentication.getAuthorities()
+                .stream()
+                .findFirst()
+                .get()
+                .getAuthority()
+                .replace("ROLE_", "");
 
-            System.out.println("AUTHENTICATION SUCCESSFUL");
-            System.out.println("USER: " + authentication.getName());
-            System.out.println("AUTHORITIES: " + authentication.getAuthorities());
-
-            String email = authentication.getName();
-
-            String role = authentication.getAuthorities()
-                    .stream()
-                    .findFirst()
-                    .get()
-                    .getAuthority()
-                    .replace("ROLE_", "");
-
-            System.out.println("ROLE: " + role);
-
-            String token = jwtService.generateToken(email, role);
-
-            System.out.println("TOKEN GENERATED");
-
-            return token;
-
-        } catch (Exception e) {
-
-            System.out.println("LOGIN ERROR: " + e.getClass().getName());
-            System.out.println("LOGIN ERROR MESSAGE: " + e.getMessage());
-
-            throw e;
-        }
+        return jwtService.generateToken(email, role);
     }
+
+
+
 
     @GetMapping("/bases")
     public List<Base> getAllBases() {
