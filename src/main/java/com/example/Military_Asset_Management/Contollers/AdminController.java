@@ -14,6 +14,7 @@
     import com.example.Military_Asset_Management.Services.AdminService;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.security.core.Authentication;
+    import org.springframework.security.crypto.password.PasswordEncoder;
     import org.springframework.web.bind.annotation.*;
 
     import java.time.LocalDate;
@@ -34,9 +35,14 @@
         @Autowired
         private AdminRepo adminRepo;
 
+        @Autowired
+        private PasswordEncoder passwordEncoder;
+
         @PostMapping("/admin/signup")
         public Admin systemAdmister(@RequestBody Admin admin){
             admin.setRole(Role.ADMIN);
+            admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+
             return adminRepo.save(admin);
         }
 
