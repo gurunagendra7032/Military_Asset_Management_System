@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/logistic_officer/signup", "/login","/get/bases","/base_commander/signup","admin/signup").permitAll()
+                        .requestMatchers("/logistic_officer/signup", "/login","/get/bases","/base_commander/signup","/admin/signup").permitAll()
                         .requestMatchers(
                                 "/purchase/**",
                                 "/transfer/**"
