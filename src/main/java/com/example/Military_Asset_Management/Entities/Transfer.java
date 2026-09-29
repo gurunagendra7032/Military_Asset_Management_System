@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class Transfer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String equipmentType;
     private String equipmentName;

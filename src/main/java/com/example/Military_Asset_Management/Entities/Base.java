@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 public class Base {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @NotBlank
     private String baseName;

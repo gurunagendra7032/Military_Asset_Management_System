@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Entity
 public class Expenditure {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String equipmentName;
     private String equipmentType;
