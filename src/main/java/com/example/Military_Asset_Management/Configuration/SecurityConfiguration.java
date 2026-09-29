@@ -38,8 +38,8 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/purchase/**",
                                 "/transfer/**"
-                        ).hasRole("LOGISTICS_OFFICER")
-                        .requestMatchers("/**").hasRole("ADMIN")
+                        ).hasAnyRole("LOGISTICS_OFFICER","ADMIN")
+
                         .requestMatchers(
                                 "/openBalance/**",
                                 "/closingBalance/**",
@@ -48,7 +48,7 @@ public class SecurityConfiguration {
                                 "/items/assign",
                                 "/save/expenditure",
                                 "/expenditure/**"
-                        ).hasRole("BASE_COMMANDER")
+                        ).hasAnyRole("BASE_COMMANDER","ADMIN")
                         .anyRequest().authenticated()
                 )
 
