@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,6 +24,18 @@ public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    // Don't process JWT for public endpoints
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+
+        String path = request.getServletPath();
+
+        return path.equals("/admin/signup")
+                || path.equals("/login")
+                || path.equals("/logistic_officer/signup")
+                || path.equals("/base_commander/signup");
+    }
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -33,10 +44,10 @@ public class JWTFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         System.out.println(
-                "JWT FILTER: " +
-                        request.getMethod() +
-                        " " +
-                        request.getRequestURI()
+                "JWT FILTER: "
+                        + request.getMethod()
+                        + " "
+                        + request.getRequestURI()
         );
 
         String authHeader = request.getHeader("Authorization");
@@ -44,24 +55,27 @@ public class JWTFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
 
-        // 1. Get JWT from Authorization header
+        // Get JWT from Authorization header
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
+
             token = authHeader.substring(7);
+
             username = jwtService.extractUsername(token);
         }
 
-        // 2. Check that user is not already authenticated
-        if (username != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+        // If JWT exists and user is not already authenticated
+        if (username != null
+                && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            // 3. Load user from database
             UserDetails userDetails =
                     userDetailsService.loadUserByUsername(username);
 
-            // 4. Validate JWT
-            if (jwtService.validateToken(username, userDetails, token)) {
+            // Validate JWT
+            if (jwtService.validateToken(
+                    username,
+                    userDetails,
+                    token)) {
 
-                // 5. Create authenticated object
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -69,15 +83,11 @@ public class JWTFilter extends OncePerRequestFilter {
                                 userDetails.getAuthorities()
                         );
 
-                // 6. Put authentication into SecurityContext
                 SecurityContextHolder.getContext()
                         .setAuthentication(authentication);
             }
         }
 
-        System.out.println("JWT FILTER: BEFORE CONTROLLER");
-        // 7. Continue request
         filterChain.doFilter(request, response);
-        System.out.println("JWT FILTER: AFTER CONTROLLER");
     }
 }

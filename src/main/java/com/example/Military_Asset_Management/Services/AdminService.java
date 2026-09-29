@@ -147,7 +147,7 @@ public class AdminService {
         User user=new User();
         user.setUserName(signupReqDto.getName());
         user.setUserEmail(signupReqDto.getEmail());
-        user.setUserName(signupReqDto.getPassword());
+        user.setPassword(passwordEncoder.encode(signupReqDto.getPassword()));
         user.setRole(Role.ADMIN);
         userRepo.save(user);
 
