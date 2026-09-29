@@ -3,8 +3,11 @@
     import com.example.Military_Asset_Management.DTOs.LoginResDto;
     import com.example.Military_Asset_Management.DTOs.SignupReqDto;
     import com.example.Military_Asset_Management.DTOs.SignupResDto;
+    import com.example.Military_Asset_Management.Entities.Admin;
     import com.example.Military_Asset_Management.Entities.Base;
+    import com.example.Military_Asset_Management.Entities.Role;
     import com.example.Military_Asset_Management.Entities.User;
+    import com.example.Military_Asset_Management.Repositories.AdminRepo;
     import com.example.Military_Asset_Management.Repositories.BaseRepo;
     import com.example.Military_Asset_Management.Repositories.PurchaseRepo;
     import com.example.Military_Asset_Management.Repositories.UserRepo;
@@ -16,7 +19,7 @@
     import java.time.LocalDate;
 
     @RestController
-    @CrossOrigin(origins = "https://militaryassetmanagementfrontend.vercel.app")
+    @CrossOrigin(origins = "https://militaryassetmanagementfrontend.vercel.app/")
     public class AdminController {
 
         @Autowired
@@ -27,6 +30,15 @@
 
         @Autowired
         private BaseRepo baseRepo;
+
+        @Autowired
+        private AdminRepo adminRepo;
+
+        @PostMapping("/admin/signup")
+        public Admin systemAdmister(@RequestBody Admin admin){
+            admin.setRole(Role.ADMIN);
+            return adminRepo.save(admin);
+        }
 
 
         @GetMapping("/openBalance/{equipmentType}/{date}")
@@ -87,8 +99,8 @@
             return adminService.saveBaseCommander(signupReqDto);
         }
 
-//        @PostMapping("/admin/signup")
-//        public SignupResDto saveAdmin(@RequestBody SignupReqDto signupReqDto){
-//            return adminService.saveAdmin(signupReqDto);
-//        }
+
+
+
+
     }

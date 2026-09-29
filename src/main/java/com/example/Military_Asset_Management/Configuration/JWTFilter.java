@@ -25,6 +25,17 @@ public class JWTFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+
+        String path = request.getServletPath();
+
+        return path.equals("/admin/signup")
+                || path.equals("/base_commander/signup")
+                || path.equals("/logistic_officer/signup")
+                || path.equals("/login");
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -43,22 +54,18 @@ public class JWTFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
 
-        // Get JWT from Authorization header
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
             token = authHeader.substring(7);
-
             username = jwtService.extractUsername(token);
         }
 
-        // If JWT exists and user is not already authenticated
         if (username != null
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails =
                     userDetailsService.loadUserByUsername(username);
 
-            // Validate JWT
             if (jwtService.validateToken(
                     username,
                     userDetails,

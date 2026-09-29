@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://militaryassetmanagementfrontend.vercel.app")
+@CrossOrigin(origins = "https://militaryassetmanagementfrontend.vercel.app/")
 public class ExpenditureController {
 
     @Autowired

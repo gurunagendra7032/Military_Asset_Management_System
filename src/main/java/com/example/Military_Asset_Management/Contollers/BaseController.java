@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "https://militaryassetmanagementfrontend.vercel.app")
+@CrossOrigin(origins = "https://militaryassetmanagementfrontend.vercel.app/")
 public class BaseController {
 
     @Autowired
