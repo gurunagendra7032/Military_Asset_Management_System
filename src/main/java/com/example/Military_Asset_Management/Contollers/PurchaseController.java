@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://militaryassetmanagementfrontend.vercel.app")
 public class PurchaseController {
 
     @Autowired
