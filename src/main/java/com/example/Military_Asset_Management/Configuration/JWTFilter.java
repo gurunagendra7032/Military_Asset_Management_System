@@ -24,18 +24,6 @@ public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    // Don't process JWT for public endpoints
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-
-        String path = request.getServletPath();
-
-        return path.equals("/admin/signup")
-                || path.equals("/login")
-                || path.equals("/logistic_officer/signup")
-                || path.equals("/base_commander/signup");
-    }
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,

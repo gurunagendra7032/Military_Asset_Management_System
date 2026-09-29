@@ -35,12 +35,12 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/logistic_officer/signup", "/login","/get/bases","/base_commander/signup","/admin/signup").permitAll()
+                        .requestMatchers("/logistic_officer/signup", "/login","/get/bases","/base_commander/signup").permitAll()
                         .requestMatchers(
                                 "/purchase/**",
                                 "/transfer/**"
-                        ).hasAnyRole("LOGISTICS_OFFICER","ADMIN")
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        ).hasRole("LOGISTICS_OFFICER")
+
                         .requestMatchers(
                                 "/openBalance/**",
                                 "/closingBalance/**",
@@ -49,7 +49,7 @@ public class SecurityConfiguration {
                                 "/items/assign",
                                 "/save/expenditure",
                                 "/expenditure/**"
-                        ).hasAnyRole("BASE_COMMANDER","ADMIN")
+                        ).hasRole("BASE_COMMANDER")
                         .anyRequest().authenticated()
                 )
 

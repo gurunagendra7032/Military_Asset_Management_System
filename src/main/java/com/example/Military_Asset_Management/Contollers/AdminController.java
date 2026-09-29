@@ -87,8 +87,8 @@
             return adminService.saveBaseCommander(signupReqDto);
         }
 
-        @PostMapping("/admin/signup")
-        public SignupResDto saveAdmin(@RequestBody SignupReqDto signupReqDto){
-            return adminService.saveAdmin(signupReqDto);
-        }
+//        @PostMapping("/admin/signup")
+//        public SignupResDto saveAdmin(@RequestBody SignupReqDto signupReqDto){
+//            return adminService.saveAdmin(signupReqDto);
+//        }
     }
